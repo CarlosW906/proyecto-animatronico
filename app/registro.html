@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Pinky el Pollo</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    
+    <div class="container">
+        <h1>Registro</h1>
+        
+        <form action="procesar_registro.php" method="POST">
+            <div class="form-group">
+                <input type="text" name="usuario" placeholder="Usuario">
+            </div>
+            <div class="form-group">
+                <br><br>
+                <input type="email" name="correo" placeholder="Correo electrónico">
+            </div>
+            <div class="form-group">
+                <br><br>
+                <input type="password" name="contrasena" placeholder="Contraseña">
+            </div>
+            <div class="form-group">
+                <br><br>
+                <input type="password" name="confirmar_contrasena" placeholder="Confirmar contraseña">
+            </div>
+            <div class="form-group">
+                <br><br>
+                <button type="submit" class="boton">Registrarse</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
