@@ -1,27 +1,34 @@
 <?php
-$conexion = mysqli_connect( "localhost","root","","Animatronico") or die("error en la conexion");
+// Conexión a la base de datos
+$conexion = new mysqli("localhost", "root", "", "animatronicobd");
 
-$usuario=$_POST['usuario'];
-$contrasena=$_POST['contrasena'];
+if ($conexion->connect_error) {
+    die("Error en la conexión: " . $conexion->connect_error);
+}
+
+// Recibir datos del formulario
+$usuario = $_POST['usuario'];
+$contrasena = $_POST['contrasena'];
 session_start();
 
-$_SESSION['usuario']=$usuario;
+// Consulta segura utilizando consultas preparadas
+$stmt = $conexion->prepare("SELECT * FROM registro WHERE usuario = ? AND contrasena = ?");
+$stmt->bind_param("ss", $usuario, $contrasena);
+$stmt->execute();
+$resultado = $stmt->get_result();
 
-$consulta="select *from registro where usuario='$usuario' and contrasena='$contrasena'";
-
-$resultado=mysqli_query($conexion,$consulta);
-
-$filas=mysqli_num_rows($resultado);
-
-if($filas){
-header("Location: inicio.html" );
-}else{
-
-
-	 echo '<script type="text/javascript">
-        alert("las contrasenas no coinciden.");
-      </script>';
-
+// Verificar si hay una fila que coincide
+if ($resultado) {
+    $_SESSION['usuario'] = $usuario;
+    header("Location: inicio.html");
+    exit();
+} else {
+    echo '<script type="text/javascript">
+            alert("Las contraseñas no coinciden.");
+            window.location.href = "login.html";
+          </script>';
 }
- header("Location: login.html");
+
+$stmt->close();
+$conexion->close();
 ?>
