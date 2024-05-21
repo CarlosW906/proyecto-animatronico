@@ -1,35 +1,42 @@
 <?php
 
-$conexion = mysqli_connect( "localhost","root","","Animatronico") or die("error en la conexion");
+$conexion = new mysqli("localhost", "root", "", "animatronicobd");
 
-$bd = mysqli_select_db($conexion,"Animatronico") or die ("Error conexion al conectarse a la base de datos");
-
-$usuario =$_POST['usuario'];
-$correo=$_POST['correo'];
-$contrasena=$_POST['contrasena'];
-$confirmar_contrasena=$_POST['confirmar_contrasena'];
-
-if($contrasena==$confirmar_contrasena){
-
-$sql="INSERT INTO registro VALUES ('$usuario','$correo','$contrasena','$confirmar_contrasena')";
-
-}else{
-
-
-  echo "las contrasenas no coinciden.! ";
-
-header("Location: registro.html" );
+if ($conexion->connect_error) {
+    die("Error en la conexión: " . $conexion->connect_error);
 }
 
-$ejecutar=mysqli_query($conexion, $sql);
+$usuario = $_POST['usuario'];
+$correo = $_POST['correo'];
+$contrasena = $_POST['contrasena'];
+$confirmar_contrasena = $_POST['confirmar_contrasena'];
 
-if(!$ejecutar){
-echo"Hubo un error";
-
-}else{
-  header("Location: inicio.html" );
-
+// Validar que las contraseñas coincidan y tengan una longitud mínima
+if ($contrasena !== $confirmar_contrasena) {
+    echo "<script>alert('Las contraseñas no coinciden.'); window.location.href = 'registro.html';</script>";
+    exit();
 }
 
+if (strlen($contrasena) < 8) {
+    echo "<script>alert('La contraseña debe tener al menos 8 caracteres.'); window.location.href = 'registro.html';</script>";
+    exit();
+}
+
+// Cifrar la contraseña antes de almacenarla
+$contrasena_hash = password_hash($contrasena, PASSWORD_BCRYPT);
+
+// Usar consultas preparadas para prevenir inyección SQL
+$stmt = $conexion->prepare("INSERT INTO registro (usuario, correo, contrasena) VALUES (?, ?, ?)");
+$stmt->bind_param("sss", $usuario, $correo, $contrasena_hash);
+
+if ($stmt->execute()) {
+    header("Location: inicio.html");
+    exit();
+} else {
+    echo "Hubo un error al registrar el usuario: " . $stmt->error;
+}
+
+$stmt->close();
+$conexion->close();
 
 ?>
